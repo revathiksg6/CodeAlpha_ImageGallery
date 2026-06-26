@@ -18,29 +18,26 @@ header h1{font-size:2rem;color:#f0a500;letter-spacing:2px}
 .page-info{text-align:center;padding:8px;color:#f0a500;font-size:0.9rem}
 .slider-wrapper{overflow:hidden;width:100%}
 .slider{display:flex;transition:transform 0.4s ease;width:100%}
-.page{min-width:100%;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:15px;padding:15px;box-sizing:border-box}
-.gallery-item{position:relative;overflow:hidden;border-radius:12px;cursor:pointer;aspect-ratio:4/3}
-.gallery-item img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s ease}
+.page{min-width:100%;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;padding:10px;box-sizing:border-box}
+.gallery-item{position:relative;overflow:hidden;border-radius:12px;cursor:pointer;aspect-ratio:4/3;background:#1a1a1a}
+.gallery-item img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s ease;display:block}
 .gallery-item:hover img{transform:scale(1.08)}
-.overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.8));padding:12px;transform:translateY(100%);transition:transform 0.3s ease}
+.overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.8));padding:8px;transform:translateY(100%);transition:transform 0.3s ease}
 .gallery-item:hover .overlay{transform:translateY(0)}
-.overlay p{font-size:0.85rem;color:#f0a500;font-weight:bold}
+.overlay p{font-size:0.75rem;color:#f0a500;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.skeleton{background:linear-gradient(90deg,#1a1a1a 25%,#2a2a2a 50%,#1a1a1a 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.loading{text-align:center;padding:30px;color:#f0a500;font-size:1.1rem;display:none}
 .nav-buttons{display:flex;justify-content:center;gap:20px;padding:15px}
 .nav-buttons button{padding:10px 30px;background:#f0a500;color:#000;border:none;border-radius:25px;font-size:1rem;cursor:pointer;font-weight:bold;transition:opacity 0.3s}
 .nav-buttons button:disabled{opacity:0.3;cursor:not-allowed}
-.loading{text-align:center;padding:30px;color:#f0a500;font-size:1.1rem;display:none}
 .lightbox{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:1000;justify-content:center;align-items:center;flex-direction:column}
 .lightbox.active{display:flex}
 .lightbox img{max-width:90%;max-height:75vh;border-radius:10px;object-fit:contain}
-.lightbox-caption{margin-top:10px;color:#f0a500;font-size:1rem;text-align:center;padding:0 20px}
+.lightbox-caption{margin-top:10px;color:#f0a500;font-size:0.9rem;text-align:center;padding:0 20px}
 .lightbox-controls{display:flex;gap:20px;margin-top:15px}
 .lightbox-controls button{padding:10px 25px;background:#f0a500;color:#000;border:none;border-radius:25px;font-size:1rem;cursor:pointer;font-weight:bold}
 .close-btn{position:absolute;top:20px;right:25px;font-size:2rem;color:white;cursor:pointer;background:none;border:none}
-@media(max-width:600px){
-.page{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;padding:10px}
-header h1{font-size:1.4rem}
-.search-bar input{width:60%}
-}
 </style>
 </head>
 <body>
@@ -79,27 +76,36 @@ const API_KEY='56465380-92458c534780589651a343896';
 let currentQuery='nature';
 let currentPage=1;
 let totalPages=1;
-let pages={};
+let pagesData={};
 let lightboxImages=[];
 let lightboxIndex=0;
 let touchStartX=0;
-let touchEndX=0;
 
 async function fetchPage(query,page){
-if(pages[page])return pages[page];
-document.getElementById('loading').style.display='block';
+if(pagesData[page])return pagesData[page];
 try{
 const res=await fetch(`https://pixabay.com/api/?key=${API_KEY}&q=${encodeURIComponent(query)}&image_type=photo&per_page=12&page=${page}&safesearch=true`);
 const data=await res.json();
-totalPages=Math.ceil(data.totalHits/12);
-pages[page]=data.hits||[];
-return pages[page];
+totalPages=Math.ceil(Math.min(data.totalHits,500)/12);
+pagesData[page]=data.hits||[];
+return pagesData[page];
 }catch(e){
 console.error(e);
 return[];
-}finally{
-document.getElementById('loading').style.display='none';
 }
+}
+
+function showSkeleton(){
+const slider=document.getElementById('slider');
+slider.innerHTML='';
+const pageEl=document.createElement('div');
+pageEl.className='page';
+for(let i=0;i<12;i++){
+const item=document.createElement('div');
+item.className='gallery-item skeleton';
+pageEl.appendChild(item);
+}
+slider.appendChild(pageEl);
 }
 
 function createPageEl(imgs,pageNum){
@@ -109,7 +115,16 @@ pageEl.dataset.page=pageNum;
 imgs.forEach((img,i)=>{
 const item=document.createElement('div');
 item.className='gallery-item';
-item.innerHTML=`<img src="${img.webformatURL}" alt="${img.tags}" loading="lazy"/><div class="overlay"><p>${img.tags.split(',')[0]}</p></div>`;
+const image=new Image();
+image.src=img.webformatURL;
+image.alt=img.tags;
+image.loading='lazy';
+image.onerror=function(){this.src=img.previewURL};
+const overlay=document.createElement('div');
+overlay.className='overlay';
+overlay.innerHTML=`<p>${img.tags.split(',')[0]}</p>`;
+item.appendChild(image);
+item.appendChild(overlay);
 item.onclick=()=>{
 lightboxImages=imgs;
 lightboxIndex=i;
@@ -123,16 +138,15 @@ return pageEl;
 
 async function goToPage(page){
 currentPage=page;
+showSkeleton();
+document.getElementById('loading').style.display='block';
 const imgs=await fetchPage(currentQuery,page);
+document.getElementById('loading').style.display='none';
 const slider=document.getElementById('slider');
-if(!slider.querySelector(`[data-page="${page}"]`)){
+slider.innerHTML='';
 const pageEl=createPageEl(imgs,page);
 slider.appendChild(pageEl);
-}
-const pages_els=slider.querySelectorAll('.page');
-const idx=Array.from(pages_els).findIndex(p=>p.dataset.page==page);
-document.getElementById('slider').style.transform=`translateX(-${idx*100}%)`;
-document.getElementById('pageInfo').textContent=`Page ${page}`;
+document.getElementById('pageInfo').textContent=`Page ${page} of ${totalPages}`;
 document.getElementById('prevBtn').disabled=page<=1;
 document.getElementById('nextBtn').disabled=page>=totalPages;
 if(page<totalPages)fetchPage(currentQuery,page+1);
@@ -143,8 +157,7 @@ document.querySelectorAll('.filter-buttons button').forEach(b=>b.classList.remov
 btn.classList.add('active');
 currentQuery=query;
 currentPage=1;
-pages={};
-document.getElementById('slider').innerHTML='';
+pagesData={};
 document.getElementById('searchInput').value='';
 await goToPage(1);
 }
@@ -154,8 +167,7 @@ const q=document.getElementById('searchInput').value.trim();
 if(!q)return;
 currentQuery=q;
 currentPage=1;
-pages={};
-document.getElementById('slider').innerHTML='';
+pagesData={};
 document.querySelectorAll('.filter-buttons button').forEach(b=>b.classList.remove('active'));
 await goToPage(1);
 }
@@ -163,19 +175,17 @@ await goToPage(1);
 function prevPage(){if(currentPage>1)goToPage(currentPage-1)}
 function nextPage(){if(currentPage<totalPages)goToPage(currentPage+1)}
 
-// Swipe support
-document.getElementById('sliderWrapper').addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX});
+document.getElementById('sliderWrapper').addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX},{passive:true});
 document.getElementById('sliderWrapper').addEventListener('touchend',e=>{
-touchEndX=e.changedTouches[0].clientX;
-const diff=touchStartX-touchEndX;
+const diff=touchStartX-e.changedTouches[0].clientX;
 if(diff>50)nextPage();
 else if(diff<-50)prevPage();
-});
+},{passive:true});
 
 function updateLightbox(){
 const img=lightboxImages[lightboxIndex];
 document.getElementById('lightbox-img').src=img.largeImageURL;
-document.getElementById('lightbox-caption').textContent=img.tags;
+document.getElementById('lightbox-caption').textContent=img.tags.split(',').slice(0,3).join(', ');
 }
 function closeLightbox(){document.getElementById('lightbox').classList.remove('active')}
 function changeLightbox(dir){
