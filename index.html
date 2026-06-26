@@ -6,28 +6,24 @@
 <title>Image Gallery</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0e1a;color:#e8eaf6;font-family:'Segoe UI',sans-serif;overflow-x:hidden;transition:background 0.3s,color 0.3s}
+body{background:#0a0e1a;color:#cfd8dc;font-family:'Segoe UI',sans-serif;overflow-x:hidden;transition:background 0.3s,color 0.3s}
 body.light{background:#f0f4ff;color:#1a1a2e}
 header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;background:linear-gradient(135deg,#1a237e,#0d47a1);box-shadow:0 2px 15px rgba(0,0,0,0.4)}
 header h1{font-size:1.8rem;color:#fff;letter-spacing:2px;text-shadow:0 0 10px rgba(100,150,255,0.5)}
-.header-icons{display:flex;gap:15px;align-items:center}
-.wishlist-icon-btn{background:none;border:none;color:#fff;font-size:1.4rem;cursor:pointer;position:relative}
-.wishlist-badge{position:absolute;top:-5px;right:-5px;background:#e53935;color:#fff;border-radius:50%;width:16px;height:16px;font-size:0.6rem;display:flex;align-items:center;justify-content:center}
 .menu-btn{background:none;border:none;color:#fff;font-size:1.6rem;cursor:pointer}
 .search-bar{display:flex;justify-content:center;padding:15px 20px;gap:10px;background:linear-gradient(135deg,#0d47a1,#1565c0)}
 .search-bar input{width:70%;padding:10px 18px;border-radius:25px;border:2px solid #90caf9;background:rgba(255,255,255,0.1);color:#fff;font-size:1rem;outline:none;transition:all 0.3s}
 .search-bar input::placeholder{color:#90caf9}
 .search-bar input:focus{background:rgba(255,255,255,0.2);border-color:#fff}
-.search-bar button{padding:10px 20px;background:#90caf9;color:#0d47a1;border:none;border-radius:25px;font-weight:bold;cursor:pointer;transition:all 0.3s}
-.search-bar button:hover{background:#fff}
+.search-bar button{padding:10px 20px;background:#90caf9;color:#0d47a1;border:none;border-radius:25px;font-weight:bold;cursor:pointer}
 .filter-buttons{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;padding:12px 20px;background:#0d1b3e}
 body.light .filter-buttons{background:#e3f2fd}
 .filter-buttons button{padding:7px 18px;border:2px solid #90caf9;background:transparent;color:#90caf9;border-radius:25px;cursor:pointer;font-size:0.85rem;transition:all 0.3s}
 .filter-buttons button:hover,.filter-buttons button.active{background:#1565c0;color:#fff;border-color:#1565c0}
-.result-count{text-align:center;padding:6px;color:#90caf9;font-size:0.85rem;background:#0a0e1a}
-body.light .result-count{background:#f0f4ff;color:#1565c0}
-.page-info{text-align:center;padding:6px;color:#e8eaf6;font-size:0.9rem;background:#0a0e1a;font-weight:bold}
-body.light .page-info{background:#f0f4ff;color:#1a1a2e}
+.result-count{text-align:center;padding:6px;color:#78909c;font-size:0.85rem;background:#0a0e1a}
+body.light .result-count{background:#f0f4ff;color:#546e7a}
+.page-info{text-align:center;padding:6px;color:#b0bec5;font-size:0.9rem;background:#0a0e1a;font-weight:600;letter-spacing:1px}
+body.light .page-info{background:#f0f4ff;color:#37474f}
 .slider-wrapper{overflow:hidden;width:100%}
 .slider{display:flex;transition:transform 0.4s ease;width:100%}
 .page{min-width:100%;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;padding:10px;box-sizing:border-box;background:#0a0e1a}
@@ -38,9 +34,10 @@ body.light .page{background:#f0f4ff}
 .overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(13,71,161,0.9));padding:8px;transform:translateY(100%);transition:transform 0.3s ease}
 .gallery-item:hover .overlay{transform:translateY(0)}
 .overlay p{font-size:0.75rem;color:#90caf9;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.heart-btn{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.5);border:none;border-radius:50%;width:32px;height:32px;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.3s;z-index:10}
-.heart-btn.liked{background:rgba(229,57,53,0.8)}
-.heart-btn:hover{transform:scale(1.2)}
+.heart-anim{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:3rem;pointer-events:none;z-index:20;transition:all 0.3s;opacity:0}
+.heart-anim.show{transform:translate(-50%,-50%) scale(1.5);opacity:1}
+.liked-indicator{position:absolute;top:8px;right:8px;font-size:1.1rem;display:none;z-index:10;filter:drop-shadow(0 0 4px rgba(229,57,53,0.8))}
+.liked-indicator.show{display:block}
 .skeleton{background:linear-gradient(90deg,#1a237e 25%,#283593 50%,#1a237e 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .loading{text-align:center;padding:20px;color:#90caf9;font-size:1rem;display:none}
@@ -48,41 +45,49 @@ body.light .page{background:#f0f4ff}
 body.light .nav-buttons{background:#f0f4ff}
 .nav-buttons button{padding:10px 30px;background:linear-gradient(135deg,#1565c0,#0d47a1);color:#fff;border:none;border-radius:25px;font-size:1rem;cursor:pointer;font-weight:bold;transition:all 0.3s;box-shadow:0 2px 8px rgba(0,0,0,0.3)}
 .nav-buttons button:disabled{opacity:0.3;cursor:not-allowed}
-.nav-buttons button:hover:not(:disabled){background:linear-gradient(135deg,#1976d2,#1565c0)}
 .back-to-top{position:fixed;bottom:80px;right:20px;background:linear-gradient(135deg,#1565c0,#0d47a1);color:#fff;border:none;border-radius:50%;width:45px;height:45px;font-size:1.3rem;cursor:pointer;display:none;z-index:999;box-shadow:0 2px 10px rgba(0,0,0,0.4)}
-/* Settings Panel */
+/* Left Side Menu */
 .overlay-bg{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1999}
 .overlay-bg.open{display:block}
-.settings-panel{position:fixed;top:0;right:-280px;width:260px;height:100%;background:#0d1b3e;z-index:2000;padding:20px;transition:right 0.3s ease;box-shadow:-5px 0 20px rgba(0,0,0,0.5);overflow-y:auto}
+.settings-panel{position:fixed;top:0;left:-280px;width:260px;height:100%;background:#0d1b3e;z-index:2000;transition:left 0.3s ease;box-shadow:5px 0 20px rgba(0,0,0,0.5);overflow-y:auto}
 body.light .settings-panel{background:#fff}
-.settings-panel.open{right:0}
-.settings-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;padding-bottom:15px;border-bottom:1px solid #1565c0}
-.settings-header h2{color:#90caf9;font-size:1.2rem}
-.close-settings{background:none;border:none;color:#90caf9;font-size:1.5rem;cursor:pointer}
-.setting-item{display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-bottom:1px solid #1a237e}
+.settings-panel.open{left:0}
+.settings-header{display:flex;justify-content:space-between;align-items:center;padding:20px;background:linear-gradient(135deg,#1a237e,#0d47a1)}
+.settings-header h2{color:#fff;font-size:1.1rem;letter-spacing:1px}
+.close-settings{background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer}
+.menu-section{padding:10px 0}
+.menu-section-title{padding:8px 20px;font-size:0.75rem;color:#546e7a;text-transform:uppercase;letter-spacing:1px}
+.setting-item{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.05);transition:background 0.2s;cursor:pointer}
+.setting-item:hover{background:rgba(255,255,255,0.05)}
 body.light .setting-item{border-bottom:1px solid #e3f2fd}
-.setting-item label{font-size:0.95rem;color:#e8eaf6}
-body.light .setting-item label{color:#1a1a2e}
-.toggle{position:relative;width:46px;height:24px}
+body.light .setting-item:hover{background:#e3f2fd}
+.setting-item label{font-size:0.95rem;color:#cfd8dc;cursor:pointer;display:flex;align-items:center;gap:10px}
+body.light .setting-item label{color:#37474f}
+.setting-item .setting-value{font-size:0.85rem;color:#78909c}
+.toggle{position:relative;width:46px;height:24px;flex-shrink:0}
 .toggle input{opacity:0;width:0;height:0}
-.toggle-slider{position:absolute;top:0;left:0;right:0;bottom:0;background:#1565c0;border-radius:24px;cursor:pointer;transition:0.3s}
+.toggle-slider{position:absolute;top:0;left:0;right:0;bottom:0;background:#37474f;border-radius:24px;cursor:pointer;transition:0.3s}
 .toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:0.3s}
-input:checked+.toggle-slider{background:#42a5f5}
+input:checked+.toggle-slider{background:#1565c0}
 input:checked+.toggle-slider:before{transform:translateX(22px)}
+.wishlist-count-badge{background:#e53935;color:#fff;border-radius:10px;padding:2px 8px;font-size:0.75rem}
 /* Wishlist Panel */
-.wishlist-panel{position:fixed;top:0;left:-100%;width:100%;height:100%;background:#0a0e1a;z-index:2000;transition:left 0.3s ease;overflow-y:auto}
+.wishlist-panel{position:fixed;top:0;left:-100%;width:100%;height:100%;background:#0a0e1a;z-index:2500;transition:left 0.3s ease;overflow-y:auto}
 body.light .wishlist-panel{background:#f0f4ff}
 .wishlist-panel.open{left:0}
 .wishlist-header{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;background:linear-gradient(135deg,#1a237e,#0d47a1)}
-.wishlist-header h2{color:#fff;font-size:1.3rem}
+.wishlist-header h2{color:#fff;font-size:1.2rem}
 .close-wishlist{background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer}
 .wishlist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;padding:15px}
-.empty-wishlist{text-align:center;padding:60px 20px;color:#90caf9;font-size:1rem}
+.empty-wishlist{text-align:center;padding:60px 20px;color:#546e7a;font-size:1rem}
+.wishlist-item{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:4/3;background:#1a237e}
+.wishlist-item img{width:100%;height:100%;object-fit:cover}
+.wishlist-remove{position:absolute;top:6px;right:6px;background:rgba(229,57,53,0.85);border:none;border-radius:50%;width:28px;height:28px;color:#fff;font-size:0.8rem;cursor:pointer}
 /* Lightbox */
 .lightbox{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.97);z-index:3000;justify-content:center;align-items:center;flex-direction:column}
 .lightbox.active{display:flex}
 .lightbox img{max-width:90%;max-height:65vh;border-radius:10px;object-fit:contain;box-shadow:0 0 30px rgba(100,150,255,0.3)}
-.lightbox-caption{margin-top:8px;color:#90caf9;font-size:0.9rem;text-align:center;padding:0 20px}
+.lightbox-caption{margin-top:8px;color:#90caf9;font-size:0.85rem;text-align:center;padding:0 20px}
 .lightbox-controls{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;justify-content:center}
 .lightbox-controls button{padding:8px 18px;background:linear-gradient(135deg,#1565c0,#0d47a1);color:#fff;border:none;border-radius:25px;font-size:0.9rem;cursor:pointer;font-weight:bold}
 .lightbox-controls a{padding:8px 18px;background:linear-gradient(135deg,#2e7d32,#1b5e20);color:#fff;border:none;border-radius:25px;font-size:0.9rem;cursor:pointer;font-weight:bold;text-decoration:none}
@@ -92,12 +97,7 @@ body.light .wishlist-panel{background:#f0f4ff}
 <body>
 <header>
 <h1>🖼 Image Gallery</h1>
-<div class="header-icons">
-<button class="wishlist-icon-btn" onclick="openWishlist()">
-❤ <span class="wishlist-badge" id="wishlistBadge">0</span>
-</button>
 <button class="menu-btn" onclick="openSettings()">☰</button>
-</div>
 </header>
 <div class="search-bar">
 <input type="text" id="searchInput" placeholder="Search any image..." onkeypress="if(event.key==='Enter')doSearch()"/>
@@ -121,13 +121,14 @@ body.light .wishlist-panel{background:#f0f4ff}
 <button id="nextBtn" onclick="nextPage()">Next &#8594;</button>
 </div>
 <button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
-<!-- Settings Panel -->
 <div class="overlay-bg" id="overlayBg" onclick="closeSettings()"></div>
 <div class="settings-panel" id="settingsPanel">
 <div class="settings-header">
-<h2>⚙ Settings</h2>
+<h2>☰ Menu</h2>
 <button class="close-settings" onclick="closeSettings()">✕</button>
 </div>
+<div class="menu-section">
+<div class="menu-section-title">Preferences</div>
 <div class="setting-item">
 <label>🌙 Light Mode</label>
 <label class="toggle">
@@ -136,19 +137,23 @@ body.light .wishlist-panel{background:#f0f4ff}
 </label>
 </div>
 <div class="setting-item">
-<label>📄 Images per page</label>
-<select id="perPageSelect" onchange="changePerPage()" style="background:#1565c0;color:#fff;border:none;border-radius:8px;padding:4px 8px">
+<label>📄 Per Page</label>
+<select id="perPageSelect" onchange="changePerPage()" style="background:#1565c0;color:#fff;border:none;border-radius:8px;padding:4px 8px;cursor:pointer">
 <option value="12">12</option>
 <option value="18">18</option>
 <option value="24">24</option>
 </select>
 </div>
-<div class="setting-item">
-<label>❤ My Wishlist</label>
-<button onclick="closeSettings();openWishlist()" style="background:#e53935;color:#fff;border:none;border-radius:15px;padding:6px 14px;cursor:pointer">View</button>
+</div>
+<div class="menu-section">
+<div class="menu-section-title">My Collection</div>
+<div class="setting-item" onclick="closeSettings();openWishlist()">
+<label>❤ Wishlist <span class="wishlist-count-badge" id="wishlistBadge">0</span></label>
+<span class="setting-value">›</span>
 </div>
 </div>
-<!-- Wishlist Panel -->
+</div>
+<!-- Wishlist -->
 <div class="wishlist-panel" id="wishlistPanel">
 <div class="wishlist-header">
 <h2>❤ My Wishlist</h2>
@@ -191,10 +196,8 @@ document.body.classList.toggle('light',isLight);
 
 function changePerPage(){
 perPage=parseInt(document.getElementById('perPageSelect').value);
-pagesData={};
-currentPage=1;
-goToPage(1);
-closeSettings();
+pagesData={};currentPage=1;
+goToPage(1);closeSettings();
 }
 
 function openSettings(){
@@ -210,21 +213,23 @@ function openWishlist(){
 const grid=document.getElementById('wishlistGrid');
 grid.innerHTML='';
 if(wishlist.length===0){
-grid.innerHTML='<div class="empty-wishlist">No saved images yet!<br>❤ heart images to save them</div>';
+grid.innerHTML='<div class="empty-wishlist">💙 No saved images yet!<br><br>Double tap any image to save</div>';
 }else{
 wishlist.forEach((img,i)=>{
 const item=document.createElement('div');
-item.className='gallery-item';
-item.style.position='relative';
+item.className='wishlist-item';
 const image=document.createElement('img');
 image.src=img.webformatURL;
 image.alt=img.tags;
-image.style.width='100%';
-image.style.height='100%';
-image.style.objectFit='cover';
+image.onclick=()=>{
+lightboxImages=wishlist;
+lightboxIndex=i;
+updateLightbox();
+document.getElementById('lightbox').classList.add('active');
+};
 const removeBtn=document.createElement('button');
-removeBtn.className='heart-btn liked';
-removeBtn.textContent='❤';
+removeBtn.className='wishlist-remove';
+removeBtn.textContent='✕';
 removeBtn.onclick=(e)=>{
 e.stopPropagation();
 wishlist.splice(i,1);
@@ -242,6 +247,8 @@ document.getElementById('wishlistPanel').classList.add('open');
 function closeWishlist(){
 document.getElementById('wishlistPanel').classList.remove('open');
 }
+
+function isWishlisted(img){return wishlist.some(w=>w.id===img.id)}
 
 async function fetchPage(query,page){
 if(pagesData[page])return pagesData[page];
@@ -268,48 +275,67 @@ pageEl.appendChild(item);
 slider.appendChild(pageEl);
 }
 
-function isWishlisted(img){
-return wishlist.some(w=>w.id===img.id);
-}
-
 function createPageEl(imgs){
 const pageEl=document.createElement('div');
 pageEl.className='page';
 imgs.forEach((img,i)=>{
 const item=document.createElement('div');
 item.className='gallery-item';
+
 const image=new Image();
 image.src=img.webformatURL;
 image.alt=img.tags;
 image.loading='lazy';
 image.onerror=function(){this.src=img.previewURL};
+
 const overlay=document.createElement('div');
 overlay.className='overlay';
 overlay.innerHTML=`<p>${img.tags.split(',')[0]}</p>`;
-const heartBtn=document.createElement('button');
-heartBtn.className='heart-btn'+(isWishlisted(img)?' liked':'');
-heartBtn.textContent='❤';
-heartBtn.onclick=(e)=>{
-e.stopPropagation();
+
+const heartAnim=document.createElement('div');
+heartAnim.className='heart-anim';
+heartAnim.textContent='❤️';
+
+const likedIndicator=document.createElement('div');
+likedIndicator.className='liked-indicator'+(isWishlisted(img)?' show':'');
+likedIndicator.textContent='❤️';
+
+item.appendChild(image);
+item.appendChild(overlay);
+item.appendChild(heartAnim);
+item.appendChild(likedIndicator);
+
+let lastTap=0;
+item.addEventListener('click',()=>{
+const now=Date.now();
+const diff=now-lastTap;
+if(diff<300&&diff>0){
+// double tap
 if(isWishlisted(img)){
 wishlist=wishlist.filter(w=>w.id!==img.id);
-heartBtn.classList.remove('liked');
+likedIndicator.classList.remove('show');
 }else{
 wishlist.push(img);
-heartBtn.classList.add('liked');
+likedIndicator.classList.add('show');
+heartAnim.classList.add('show');
+setTimeout(()=>heartAnim.classList.remove('show'),600);
 }
 localStorage.setItem('gallery_wishlist',JSON.stringify(wishlist));
 updateWishlistBadge();
-};
-item.appendChild(image);
-item.appendChild(overlay);
-item.appendChild(heartBtn);
-item.onclick=()=>{
+}else{
+// single tap - open lightbox
+setTimeout(()=>{
+if(Date.now()-lastTap>=300){
 lightboxImages=imgs;
 lightboxIndex=i;
 updateLightbox();
 document.getElementById('lightbox').classList.add('active');
-};
+}
+},300);
+}
+lastTap=now;
+});
+
 pageEl.appendChild(item);
 });
 return pageEl;
@@ -335,9 +361,7 @@ if(page<totalPages)fetchPage(currentQuery,page+1);
 async function loadCategory(query,btn){
 document.querySelectorAll('.filter-buttons button').forEach(b=>b.classList.remove('active'));
 btn.classList.add('active');
-currentQuery=query;
-currentPage=1;
-pagesData={};
+currentQuery=query;currentPage=1;pagesData={};
 document.getElementById('searchInput').value='';
 await goToPage(1);
 }
@@ -345,9 +369,7 @@ await goToPage(1);
 async function doSearch(){
 const q=document.getElementById('searchInput').value.trim();
 if(!q)return;
-currentQuery=q;
-currentPage=1;
-pagesData={};
+currentQuery=q;currentPage=1;pagesData={};
 document.querySelectorAll('.filter-buttons button').forEach(b=>b.classList.remove('active'));
 await goToPage(1);
 }
