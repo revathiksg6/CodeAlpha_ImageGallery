@@ -22,7 +22,9 @@ header h1{font-size:2rem;color:#f0a500;letter-spacing:2px}
 .overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.8));padding:15px;transform:translateY(100%);transition:transform 0.3s ease}
 .gallery-item:hover .overlay{transform:translateY(0)}
 .overlay p{font-size:0.9rem;color:#f0a500;font-weight:bold}
-.no-results{text-align:center;padding:40px;color:#f0a500;font-size:1.1rem}
+.loading{text-align:center;padding:30px;color:#f0a500;font-size:1.1rem;display:none}
+.no-results{text-align:center;padding:40px;color:#f0a500;font-size:1.1rem;display:none}
+.load-more{display:none;margin:20px auto;padding:12px 35px;background:#f0a500;color:#000;border:none;border-radius:25px;font-size:1rem;font-weight:bold;cursor:pointer}
 .lightbox{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:1000;justify-content:center;align-items:center;flex-direction:column}
 .lightbox.active{display:flex}
 .lightbox img{max-width:90%;max-height:75vh;border-radius:10px;object-fit:contain}
@@ -40,17 +42,20 @@ header h1{font-size:1.4rem}
 <body>
 <header><h1>Image Gallery</h1></header>
 <div class="search-bar">
-<input type="text" id="searchInput" placeholder="Search images..." onkeypress="if(event.key==='Enter')searchImages()"/>
+<input type="text" id="searchInput" placeholder="Search any image..." onkeypress="if(event.key==='Enter')searchImages()"/>
 <button onclick="searchImages()">Search</button>
 </div>
 <div class="filter-buttons">
-<button class="active" onclick="filterGallery('all',this)">All</button>
-<button onclick="filterGallery('nature',this)">Nature</button>
-<button onclick="filterGallery('architecture',this)">Architecture</button>
-<button onclick="filterGallery('travel',this)">Travel</button>
+<button class="active" onclick="loadCategory('nature',this)">Nature</button>
+<button onclick="loadCategory('architecture',this)">Architecture</button>
+<button onclick="loadCategory('travel',this)">Travel</button>
+<button onclick="loadCategory('food',this)">Food</button>
+<button onclick="loadCategory('technology',this)">Technology</button>
 </div>
 <div class="gallery" id="gallery"></div>
-<div class="no-results" id="noResults" style="display:none">No images found!</div>
+<div class="loading" id="loading">Loading...</div>
+<div class="no-results" id="noResults">No images found!</div>
+<button class="load-more" id="loadMoreBtn" onclick="loadMore()">Load More</button>
 <div class="lightbox" id="lightbox">
 <button class="close-btn" onclick="closeLightbox()">✕</button>
 <img id="lightbox-img" src="" alt=""/>
@@ -61,59 +66,74 @@ header h1{font-size:1.4rem}
 </div>
 </div>
 <script>
-const images=[
-{src:"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600",category:"nature",title:"Mountain Peaks"},
-{src:"https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600",category:"nature",title:"Forest Path"},
-{src:"https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600",category:"nature",title:"Foggy Hills"},
-{src:"https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=600",category:"nature",title:"Green Valley"},
-{src:"https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600",category:"nature",title:"Aerial Nature"},
-{src:"https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600",category:"architecture",title:"City Skyline"},
-{src:"https://images.unsplash.com/photo-1431274172761-fca41d930114?w=600",category:"architecture",title:"Paris Streets"},
-{src:"https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=600",category:"architecture",title:"Night City"},
-{src:"https://images.unsplash.com/photo-1555993539-1732b0258235?w=600",category:"architecture",title:"Modern Bridge"},
-{src:"https://images.unsplash.com/photo-1488085061387-422e29b40080?w=600",category:"travel",title:"Santorini"},
-{src:"https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600",category:"travel",title:"Lake View"},
-{src:"https://images.unsplash.com/photo-1503220317375-aaad61436b1b?w=600",category:"travel",title:"Beach Sunset"}
-];
-
-let filtered=[...images];
+const ACCESS_KEY='tWJ_91OayA3gfkj4QTBk-rWTGFgV6IN_KT';
+let currentImages=[];
+let currentPage=1;
+let currentQuery='nature';
 let currentIndex=0;
 
-function renderGallery(list){
-const gallery=document.getElementById('gallery');
-gallery.innerHTML='';
-if(list.length===0){
-document.getElementById('noResults').style.display='block';
-return;
-}
+async function fetchImages(query,page=1){
+document.getElementById('loading').style.display='block';
 document.getElementById('noResults').style.display='none';
-list.forEach((img,i)=>{
-const item=document.createElement('div');
-item.className='gallery-item';
-item.innerHTML=`<img src="${img.src}" alt="${img.title}" loading="lazy"/><div class="overlay"><p>${img.title}</p></div>`;
-item.onclick=()=>openLightbox(i);
-gallery.appendChild(item);
-});
+try{
+const url=`https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&page=${page}&per_page=12&client_id=${ACCESS_KEY}`;
+const proxyUrl=`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+const res=await fetch(proxyUrl);
+const data=await res.json();
+const parsed=JSON.parse(data.contents);
+return parsed.results||[];
+}catch(e){
+console.error(e);
+return[];
+}finally{
+document.getElementById('loading').style.display='none';
+}
 }
 
-function filterGallery(cat,btn){
+async function loadCategory(query,btn){
 document.querySelectorAll('.filter-buttons button').forEach(b=>b.classList.remove('active'));
 btn.classList.add('active');
+currentQuery=query;
+currentPage=1;
 document.getElementById('searchInput').value='';
-filtered=cat==='all'?[...images]:images.filter(img=>img.category===cat);
-renderGallery(filtered);
+const imgs=await fetchImages(query,1);
+currentImages=imgs;
+renderGallery(imgs,false);
+document.getElementById('loadMoreBtn').style.display=imgs.length?'block':'none';
+if(!imgs.length)document.getElementById('noResults').style.display='block';
 }
 
-function searchImages(){
-const q=document.getElementById('searchInput').value.toLowerCase().trim();
-if(!q){
-filtered=[...images];
-renderGallery(filtered);
-return;
-}
+async function searchImages(){
+const q=document.getElementById('searchInput').value.trim();
+if(!q)return;
+currentQuery=q;
+currentPage=1;
 document.querySelectorAll('.filter-buttons button').forEach(b=>b.classList.remove('active'));
-filtered=images.filter(img=>img.title.toLowerCase().includes(q)||img.category.toLowerCase().includes(q));
-renderGallery(filtered);
+const imgs=await fetchImages(q,1);
+currentImages=imgs;
+renderGallery(imgs,false);
+document.getElementById('loadMoreBtn').style.display=imgs.length?'block':'none';
+if(!imgs.length)document.getElementById('noResults').style.display='block';
+}
+
+async function loadMore(){
+currentPage++;
+const imgs=await fetchImages(currentQuery,currentPage);
+currentImages=[...currentImages,...imgs];
+renderGallery(imgs,true);
+}
+
+function renderGallery(imgs,append){
+const gallery=document.getElementById('gallery');
+if(!append)gallery.innerHTML='';
+imgs.forEach((img,i)=>{
+const idx=append?currentImages.length-imgs.length+i:i;
+const item=document.createElement('div');
+item.className='gallery-item';
+item.innerHTML=`<img src="${img.urls.small}" alt="${img.alt_description||'image'}" loading="lazy"/><div class="overlay"><p>${img.alt_description||img.user.name}</p></div>`;
+item.onclick=()=>openLightbox(idx);
+gallery.appendChild(item);
+});
 }
 
 function openLightbox(index){
@@ -127,16 +147,17 @@ document.getElementById('lightbox').classList.remove('active');
 }
 
 function changeImage(dir){
-currentIndex=(currentIndex+dir+filtered.length)%filtered.length;
+currentIndex=(currentIndex+dir+currentImages.length)%currentImages.length;
 updateLightbox();
 }
 
 function updateLightbox(){
-document.getElementById('lightbox-img').src=filtered[currentIndex].src;
-document.getElementById('lightbox-caption').textContent=filtered[currentIndex].title;
+const img=currentImages[currentIndex];
+document.getElementById('lightbox-img').src=img.urls.regular;
+document.getElementById('lightbox-caption').textContent=img.alt_description||img.user.name;
 }
 
-renderGallery(images);
+loadCategory('nature',document.querySelector('.filter-buttons button'));
 </script>
 </body>
 </html>
