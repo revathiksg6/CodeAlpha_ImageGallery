@@ -6,25 +6,29 @@
 <title>Image Gallery</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0f0f0f;color:white;font-family:'Segoe UI',sans-serif}
-header{text-align:center;padding:30px 20px 10px}
+body{background:#0f0f0f;color:white;font-family:'Segoe UI',sans-serif;overflow-x:hidden}
+header{text-align:center;padding:20px 20px 10px}
 header h1{font-size:2rem;color:#f0a500;letter-spacing:2px}
-.search-bar{display:flex;justify-content:center;padding:15px 20px;gap:10px}
+.search-bar{display:flex;justify-content:center;padding:10px 20px;gap:10px}
 .search-bar input{width:70%;padding:10px 18px;border-radius:25px;border:2px solid #f0a500;background:#1a1a1a;color:white;font-size:1rem;outline:none}
 .search-bar button{padding:10px 20px;background:#f0a500;color:#000;border:none;border-radius:25px;font-weight:bold;cursor:pointer}
-.filter-buttons{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;padding:10px 20px}
-.filter-buttons button{padding:8px 20px;border:2px solid #f0a500;background:transparent;color:#f0a500;border-radius:25px;cursor:pointer;font-size:0.9rem;transition:all 0.3s}
+.filter-buttons{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;padding:8px 20px}
+.filter-buttons button{padding:7px 18px;border:2px solid #f0a500;background:transparent;color:#f0a500;border-radius:25px;cursor:pointer;font-size:0.85rem;transition:all 0.3s}
 .filter-buttons button:hover,.filter-buttons button.active{background:#f0a500;color:#000}
-.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:15px;padding:20px;max-width:1200px;margin:auto}
+.page-info{text-align:center;padding:8px;color:#f0a500;font-size:0.9rem}
+.slider-wrapper{overflow:hidden;width:100%}
+.slider{display:flex;transition:transform 0.4s ease;width:100%}
+.page{min-width:100%;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:15px;padding:15px;box-sizing:border-box}
 .gallery-item{position:relative;overflow:hidden;border-radius:12px;cursor:pointer;aspect-ratio:4/3}
 .gallery-item img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s ease}
 .gallery-item:hover img{transform:scale(1.08)}
-.overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.8));padding:15px;transform:translateY(100%);transition:transform 0.3s ease}
+.overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.8));padding:12px;transform:translateY(100%);transition:transform 0.3s ease}
 .gallery-item:hover .overlay{transform:translateY(0)}
-.overlay p{font-size:0.9rem;color:#f0a500;font-weight:bold}
+.overlay p{font-size:0.85rem;color:#f0a500;font-weight:bold}
+.nav-buttons{display:flex;justify-content:center;gap:20px;padding:15px}
+.nav-buttons button{padding:10px 30px;background:#f0a500;color:#000;border:none;border-radius:25px;font-size:1rem;cursor:pointer;font-weight:bold;transition:opacity 0.3s}
+.nav-buttons button:disabled{opacity:0.3;cursor:not-allowed}
 .loading{text-align:center;padding:30px;color:#f0a500;font-size:1.1rem;display:none}
-.no-results{text-align:center;padding:40px;color:#f0a500;font-size:1.1rem;display:none}
-.load-more{display:none;margin:20px auto;padding:12px 35px;background:#f0a500;color:#000;border:none;border-radius:25px;font-size:1rem;font-weight:bold;cursor:pointer}
 .lightbox{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:1000;justify-content:center;align-items:center;flex-direction:column}
 .lightbox.active{display:flex}
 .lightbox img{max-width:90%;max-height:75vh;border-radius:10px;object-fit:contain}
@@ -33,7 +37,7 @@ header h1{font-size:2rem;color:#f0a500;letter-spacing:2px}
 .lightbox-controls button{padding:10px 25px;background:#f0a500;color:#000;border:none;border-radius:25px;font-size:1rem;cursor:pointer;font-weight:bold}
 .close-btn{position:absolute;top:20px;right:25px;font-size:2rem;color:white;cursor:pointer;background:none;border:none}
 @media(max-width:600px){
-.gallery{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;padding:10px}
+.page{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;padding:10px}
 header h1{font-size:1.4rem}
 .search-bar input{width:60%}
 }
@@ -42,8 +46,8 @@ header h1{font-size:1.4rem}
 <body>
 <header><h1>Image Gallery</h1></header>
 <div class="search-bar">
-<input type="text" id="searchInput" placeholder="Search any image..." onkeypress="if(event.key==='Enter')searchImages()"/>
-<button onclick="searchImages()">Search</button>
+<input type="text" id="searchInput" placeholder="Search any image..." onkeypress="if(event.key==='Enter')doSearch()"/>
+<button onclick="doSearch()">Search</button>
 </div>
 <div class="filter-buttons">
 <button class="active" onclick="loadCategory('nature',this)">Nature</button>
@@ -52,34 +56,44 @@ header h1{font-size:1.4rem}
 <button onclick="loadCategory('food',this)">Food</button>
 <button onclick="loadCategory('technology',this)">Technology</button>
 </div>
-<div class="gallery" id="gallery"></div>
+<div class="page-info" id="pageInfo">Page 1</div>
 <div class="loading" id="loading">Loading...</div>
-<div class="no-results" id="noResults">No images found!</div>
-<button class="load-more" id="loadMoreBtn" onclick="loadMore()">Load More</button>
+<div class="slider-wrapper" id="sliderWrapper">
+<div class="slider" id="slider"></div>
+</div>
+<div class="nav-buttons">
+<button id="prevBtn" onclick="prevPage()" disabled>&#8592; Prev</button>
+<button id="nextBtn" onclick="nextPage()">Next &#8594;</button>
+</div>
 <div class="lightbox" id="lightbox">
 <button class="close-btn" onclick="closeLightbox()">✕</button>
 <img id="lightbox-img" src="" alt=""/>
 <p class="lightbox-caption" id="lightbox-caption"></p>
 <div class="lightbox-controls">
-<button onclick="changeImage(-1)">&#8592; Prev</button>
-<button onclick="changeImage(1)">Next &#8594;</button>
+<button onclick="changeLightbox(-1)">&#8592; Prev</button>
+<button onclick="changeLightbox(1)">Next &#8594;</button>
 </div>
 </div>
 <script>
 const API_KEY='56465380-92458c534780589651a343896';
-let currentImages=[];
-let currentPage=1;
 let currentQuery='nature';
-let currentIndex=0;
+let currentPage=1;
+let totalPages=1;
+let pages={};
+let lightboxImages=[];
+let lightboxIndex=0;
+let touchStartX=0;
+let touchEndX=0;
 
-async function fetchImages(query,page=1){
+async function fetchPage(query,page){
+if(pages[page])return pages[page];
 document.getElementById('loading').style.display='block';
-document.getElementById('noResults').style.display='none';
-document.getElementById('loadMoreBtn').style.display='none';
 try{
 const res=await fetch(`https://pixabay.com/api/?key=${API_KEY}&q=${encodeURIComponent(query)}&image_type=photo&per_page=12&page=${page}&safesearch=true`);
 const data=await res.json();
-return data.hits||[];
+totalPages=Math.ceil(data.totalHits/12);
+pages[page]=data.hits||[];
+return pages[page];
 }catch(e){
 console.error(e);
 return[];
@@ -88,71 +102,85 @@ document.getElementById('loading').style.display='none';
 }
 }
 
+function createPageEl(imgs,pageNum){
+const pageEl=document.createElement('div');
+pageEl.className='page';
+pageEl.dataset.page=pageNum;
+imgs.forEach((img,i)=>{
+const item=document.createElement('div');
+item.className='gallery-item';
+item.innerHTML=`<img src="${img.webformatURL}" alt="${img.tags}" loading="lazy"/><div class="overlay"><p>${img.tags.split(',')[0]}</p></div>`;
+item.onclick=()=>{
+lightboxImages=imgs;
+lightboxIndex=i;
+updateLightbox();
+document.getElementById('lightbox').classList.add('active');
+};
+pageEl.appendChild(item);
+});
+return pageEl;
+}
+
+async function goToPage(page){
+currentPage=page;
+const imgs=await fetchPage(currentQuery,page);
+const slider=document.getElementById('slider');
+if(!slider.querySelector(`[data-page="${page}"]`)){
+const pageEl=createPageEl(imgs,page);
+slider.appendChild(pageEl);
+}
+const pages_els=slider.querySelectorAll('.page');
+const idx=Array.from(pages_els).findIndex(p=>p.dataset.page==page);
+document.getElementById('slider').style.transform=`translateX(-${idx*100}%)`;
+document.getElementById('pageInfo').textContent=`Page ${page}`;
+document.getElementById('prevBtn').disabled=page<=1;
+document.getElementById('nextBtn').disabled=page>=totalPages;
+if(page<totalPages)fetchPage(currentQuery,page+1);
+}
+
 async function loadCategory(query,btn){
 document.querySelectorAll('.filter-buttons button').forEach(b=>b.classList.remove('active'));
 btn.classList.add('active');
 currentQuery=query;
 currentPage=1;
+pages={};
+document.getElementById('slider').innerHTML='';
 document.getElementById('searchInput').value='';
-const imgs=await fetchImages(query,1);
-currentImages=imgs;
-renderGallery(imgs,false);
-if(!imgs.length)document.getElementById('noResults').style.display='block';
-else document.getElementById('loadMoreBtn').style.display='block';
+await goToPage(1);
 }
 
-async function searchImages(){
+async function doSearch(){
 const q=document.getElementById('searchInput').value.trim();
 if(!q)return;
 currentQuery=q;
 currentPage=1;
+pages={};
+document.getElementById('slider').innerHTML='';
 document.querySelectorAll('.filter-buttons button').forEach(b=>b.classList.remove('active'));
-const imgs=await fetchImages(q,1);
-currentImages=imgs;
-renderGallery(imgs,false);
-if(!imgs.length)document.getElementById('noResults').style.display='block';
-else document.getElementById('loadMoreBtn').style.display='block';
+await goToPage(1);
 }
 
-async function loadMore(){
-currentPage++;
-const imgs=await fetchImages(currentQuery,currentPage);
-currentImages=[...currentImages,...imgs];
-renderGallery(imgs,true);
-}
+function prevPage(){if(currentPage>1)goToPage(currentPage-1)}
+function nextPage(){if(currentPage<totalPages)goToPage(currentPage+1)}
 
-function renderGallery(imgs,append){
-const gallery=document.getElementById('gallery');
-if(!append)gallery.innerHTML='';
-imgs.forEach((img,i)=>{
-const idx=append?currentImages.length-imgs.length+i:i;
-const item=document.createElement('div');
-item.className='gallery-item';
-item.innerHTML=`<img src="${img.webformatURL}" alt="${img.tags}" loading="lazy"/><div class="overlay"><p>${img.tags.split(',')[0]}</p></div>`;
-item.onclick=()=>openLightbox(idx);
-gallery.appendChild(item);
+// Swipe support
+document.getElementById('sliderWrapper').addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX});
+document.getElementById('sliderWrapper').addEventListener('touchend',e=>{
+touchEndX=e.changedTouches[0].clientX;
+const diff=touchStartX-touchEndX;
+if(diff>50)nextPage();
+else if(diff<-50)prevPage();
 });
-}
-
-function openLightbox(index){
-currentIndex=index;
-updateLightbox();
-document.getElementById('lightbox').classList.add('active');
-}
-
-function closeLightbox(){
-document.getElementById('lightbox').classList.remove('active');
-}
-
-function changeImage(dir){
-currentIndex=(currentIndex+dir+currentImages.length)%currentImages.length;
-updateLightbox();
-}
 
 function updateLightbox(){
-const img=currentImages[currentIndex];
+const img=lightboxImages[lightboxIndex];
 document.getElementById('lightbox-img').src=img.largeImageURL;
 document.getElementById('lightbox-caption').textContent=img.tags;
+}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('active')}
+function changeLightbox(dir){
+lightboxIndex=(lightboxIndex+dir+lightboxImages.length)%lightboxImages.length;
+updateLightbox();
 }
 
 loadCategory('nature',document.querySelector('.filter-buttons button'));
