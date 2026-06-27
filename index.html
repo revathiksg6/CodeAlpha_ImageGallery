@@ -6,102 +6,107 @@
 <title>Image Gallery</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0e1a;color:#ffffff;font-family:'Segoe UI',sans-serif;overflow-x:hidden;transition:background 0.3s,color 0.3s}
-body.light{background:#f0f4ff;color:#1a1a2e}
-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;background:linear-gradient(135deg,#1a237e,#0d47a1);box-shadow:0 2px 15px rgba(0,0,0,0.4)}
-header h1{font-size:1.8rem;color:#fff;letter-spacing:2px;text-shadow:0 0 10px rgba(100,150,255,0.5)}
-.menu-btn{background:none;border:none;color:#fff;font-size:1.6rem;cursor:pointer}
-.search-bar{display:flex;justify-content:center;padding:15px 20px;gap:10px;background:linear-gradient(135deg,#0d47a1,#1565c0)}
-.search-bar input{width:70%;padding:10px 18px;border-radius:25px;border:2px solid #90caf9;background:rgba(255,255,255,0.1);color:#fff;font-size:1rem;outline:none;transition:all 0.3s}
-.search-bar input::placeholder{color:#90caf9}
-.search-bar input:focus{background:rgba(255,255,255,0.2);border-color:#fff}
-.search-bar button{padding:10px 20px;background:#90caf9;color:#0d47a1;border:none;border-radius:25px;font-weight:bold;cursor:pointer}
-.filter-buttons{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;padding:12px 20px;background:#0d1b3e}
-body.light .filter-buttons{background:#e3f2fd}
-.filter-buttons button{padding:7px 18px;border:2px solid #90caf9;background:transparent;color:#90caf9;border-radius:25px;cursor:pointer;font-size:0.85rem;transition:all 0.3s}
-.filter-buttons button:hover,.filter-buttons button.active{background:#1565c0;color:#fff;border-color:#1565c0}
-.result-count{text-align:center;padding:6px;color:#f0a500;font-size:0.85rem;background:#0a0e1a}
-body.light .result-count{background:#f0f4ff;color:#546e7a}
-.page-info{text-align:center;padding:6px;color:#ffffff;font-size:0.9rem;background:#0a0e1a;font-weight:600;letter-spacing:1px}
-body.light .page-info{background:#f0f4ff;color:#37474f}
+body{background:#0f0f0f;color:#fff;font-family:'Segoe UI',sans-serif;overflow-x:hidden;transition:background 0.3s,color 0.3s}
+body.light{background:#fafafa;color:#111}
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;background:linear-gradient(135deg,#1a1a1a,#2d2d2d);border-bottom:2px solid #f0a500;box-shadow:0 2px 20px rgba(240,165,0,0.2)}
+header h1{font-size:1.8rem;color:#f0a500;letter-spacing:3px;font-weight:700;text-shadow:0 0 15px rgba(240,165,0,0.4)}
+.menu-btn{background:none;border:none;color:#f0a500;font-size:1.6rem;cursor:pointer}
+.search-bar{display:flex;justify-content:center;padding:15px 20px;gap:10px;background:#1a1a1a;border-bottom:1px solid #2a2a2a}
+.search-bar input{width:70%;padding:10px 18px;border-radius:25px;border:2px solid #f0a500;background:#0f0f0f;color:#fff;font-size:1rem;outline:none;transition:all 0.3s}
+body.light .search-bar input{background:#fff;color:#111}
+.search-bar input::placeholder{color:#888}
+.search-bar input:focus{border-color:#ffd54f;box-shadow:0 0 10px rgba(240,165,0,0.3)}
+.search-bar button{padding:10px 22px;background:#f0a500;color:#000;border:none;border-radius:25px;font-weight:700;cursor:pointer;transition:all 0.3s;letter-spacing:1px}
+.search-bar button:hover{background:#ffd54f}
+.filter-buttons{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;padding:12px 20px;background:#111}
+body.light .filter-buttons{background:#f0f0f0}
+.filter-buttons button{padding:7px 18px;border:2px solid #f0a500;background:transparent;color:#f0a500;border-radius:25px;cursor:pointer;font-size:0.85rem;font-weight:600;transition:all 0.3s}
+.filter-buttons button:hover,.filter-buttons button.active{background:#f0a500;color:#000}
+.result-count{text-align:center;padding:6px;color:#f0a500;font-size:0.85rem;background:#0f0f0f;letter-spacing:1px}
+body.light .result-count{background:#fafafa;color:#c8860a}
+.page-info{text-align:center;padding:6px;color:#fff;font-size:0.95rem;background:#0f0f0f;font-weight:700;letter-spacing:2px}
+body.light .page-info{background:#fafafa;color:#111}
 .slider-wrapper{overflow:hidden;width:100%}
 .slider{display:flex;transition:transform 0.4s ease;width:100%}
-.page{min-width:100%;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;padding:10px;box-sizing:border-box;background:#0a0e1a}
-body.light .page{background:#f0f4ff}
-.gallery-item{position:relative;overflow:hidden;border-radius:12px;cursor:pointer;aspect-ratio:4/3;background:#1a237e;box-shadow:0 2px 8px rgba(0,0,0,0.3)}
+.page{min-width:100%;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;padding:10px;box-sizing:border-box;background:#0f0f0f}
+body.light .page{background:#fafafa}
+.gallery-item{position:relative;overflow:hidden;border-radius:12px;cursor:pointer;aspect-ratio:4/3;background:#1a1a1a;box-shadow:0 2px 10px rgba(0,0,0,0.5);border:1px solid #2a2a2a;transition:border-color 0.3s}
+.gallery-item:hover{border-color:#f0a500}
 .gallery-item img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s ease;display:block}
 .gallery-item:hover img{transform:scale(1.08)}
-.overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(13,71,161,0.9));padding:8px;transform:translateY(100%);transition:transform 0.3s ease}
+.overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.85));padding:8px;transform:translateY(100%);transition:transform 0.3s ease}
 .gallery-item:hover .overlay{transform:translateY(0)}
-.overlay p{font-size:0.75rem;color:#90caf9;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.overlay p{font-size:0.75rem;color:#f0a500;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:0.5px}
 .heart-anim{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:3rem;pointer-events:none;z-index:20;transition:all 0.3s;opacity:0}
 .heart-anim.show{transform:translate(-50%,-50%) scale(1.5);opacity:1}
-.liked-indicator{position:absolute;top:8px;right:8px;font-size:1.1rem;display:none;z-index:10;filter:drop-shadow(0 0 4px rgba(229,57,53,0.8))}
+.liked-indicator{position:absolute;top:8px;right:8px;font-size:1.1rem;display:none;z-index:10;filter:drop-shadow(0 0 4px rgba(240,165,0,0.8))}
 .liked-indicator.show{display:block}
-.skeleton{background:linear-gradient(90deg,#1a237e 25%,#283593 50%,#1a237e 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+.skeleton{background:linear-gradient(90deg,#1a1a1a 25%,#2a2a2a 50%,#1a1a1a 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-.loading{text-align:center;padding:20px;color:#90caf9;font-size:1rem;display:none}
-.nav-buttons{display:flex;justify-content:center;gap:20px;padding:15px;background:#0a0e1a}
-body.light .nav-buttons{background:#f0f4ff}
-.nav-buttons button{padding:10px 30px;background:linear-gradient(135deg,#1565c0,#0d47a1);color:#fff;border:none;border-radius:25px;font-size:1rem;cursor:pointer;font-weight:bold;transition:all 0.3s;box-shadow:0 2px 8px rgba(0,0,0,0.3)}
+.loading{text-align:center;padding:20px;color:#f0a500;font-size:1rem;display:none;letter-spacing:1px}
+.nav-buttons{display:flex;justify-content:center;gap:20px;padding:15px;background:#0f0f0f;border-top:1px solid #2a2a2a}
+body.light .nav-buttons{background:#fafafa}
+.nav-buttons button{padding:10px 30px;background:#f0a500;color:#000;border:none;border-radius:25px;font-size:1rem;cursor:pointer;font-weight:700;transition:all 0.3s;letter-spacing:1px}
+.nav-buttons button:hover:not(:disabled){background:#ffd54f}
 .nav-buttons button:disabled{opacity:0.3;cursor:not-allowed}
-.back-to-top{position:fixed;bottom:80px;right:20px;background:linear-gradient(135deg,#1565c0,#0d47a1);color:#fff;border:none;border-radius:50%;width:45px;height:45px;font-size:1.3rem;cursor:pointer;display:none;z-index:999;box-shadow:0 2px 10px rgba(0,0,0,0.4)}
-/* Left Side Menu */
-.overlay-bg{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1999}
+.back-to-top{position:fixed;bottom:80px;right:20px;background:#f0a500;color:#000;border:none;border-radius:50%;width:45px;height:45px;font-size:1.3rem;cursor:pointer;display:none;z-index:999;box-shadow:0 2px 15px rgba(240,165,0,0.4)}
+/* Left Menu */
+.overlay-bg{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:1999}
 .overlay-bg.open{display:block}
-.settings-panel{position:fixed;top:0;left:-280px;width:260px;height:100%;background:#0d1b3e;z-index:2000;transition:left 0.3s ease;box-shadow:5px 0 20px rgba(0,0,0,0.5);overflow-y:auto}
-body.light .settings-panel{background:#fff}
+.settings-panel{position:fixed;top:0;left:-280px;width:260px;height:100%;background:#111;z-index:2000;transition:left 0.3s ease;box-shadow:5px 0 25px rgba(0,0,0,0.8);overflow-y:auto;border-right:1px solid #f0a500}
+body.light .settings-panel{background:#fff;border-right:1px solid #f0a500}
 .settings-panel.open{left:0}
-.settings-header{display:flex;justify-content:space-between;align-items:center;padding:20px;background:linear-gradient(135deg,#1a237e,#0d47a1)}
-.settings-header h2{color:#fff;font-size:1.1rem;letter-spacing:1px}
-.close-settings{background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer}
+.settings-header{display:flex;justify-content:space-between;align-items:center;padding:20px;background:linear-gradient(135deg,#1a1a1a,#2d2d2d);border-bottom:2px solid #f0a500}
+.settings-header h2{color:#f0a500;font-size:1.1rem;letter-spacing:2px;font-weight:700}
+.close-settings{background:none;border:none;color:#f0a500;font-size:1.5rem;cursor:pointer}
 .menu-section{padding:10px 0}
-.menu-section-title{padding:8px 20px;font-size:0.75rem;color:#546e7a;text-transform:uppercase;letter-spacing:1px}
-.setting-item{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.05);transition:background 0.2s;cursor:pointer}
-.setting-item:hover{background:rgba(255,255,255,0.05)}
-body.light .setting-item{border-bottom:1px solid #e3f2fd}
-body.light .setting-item:hover{background:#e3f2fd}
-.setting-item label{font-size:0.95rem;color:#cfd8dc;cursor:pointer;display:flex;align-items:center;gap:10px}
-body.light .setting-item label{color:#37474f}
-.setting-item .setting-value{font-size:0.85rem;color:#78909c}
+.menu-section-title{padding:8px 20px;font-size:0.7rem;color:#888;text-transform:uppercase;letter-spacing:2px}
+.setting-item{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid #222;transition:background 0.2s;cursor:pointer}
+.setting-item:hover{background:#1a1a1a}
+body.light .setting-item{border-bottom:1px solid #f0f0f0}
+body.light .setting-item:hover{background:#f9f9f9}
+.setting-item label{font-size:0.95rem;color:#fff;cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:500}
+body.light .setting-item label{color:#111}
+.setting-item .setting-value{font-size:0.85rem;color:#888}
 .toggle{position:relative;width:46px;height:24px;flex-shrink:0}
 .toggle input{opacity:0;width:0;height:0}
-.toggle-slider{position:absolute;top:0;left:0;right:0;bottom:0;background:#37474f;border-radius:24px;cursor:pointer;transition:0.3s}
+.toggle-slider{position:absolute;top:0;left:0;right:0;bottom:0;background:#333;border-radius:24px;cursor:pointer;transition:0.3s}
 .toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:0.3s}
-input:checked+.toggle-slider{background:#1565c0}
+input:checked+.toggle-slider{background:#f0a500}
 input:checked+.toggle-slider:before{transform:translateX(22px)}
-.wishlist-count-badge{background:#e53935;color:#fff;border-radius:10px;padding:2px 8px;font-size:0.75rem}
-/* Wishlist Panel */
-.wishlist-panel{position:fixed;top:0;left:-100%;width:100%;height:100%;background:#0a0e1a;z-index:2500;transition:left 0.3s ease;overflow-y:auto}
-body.light .wishlist-panel{background:#f0f4ff}
+.wishlist-count-badge{background:#f0a500;color:#000;border-radius:10px;padding:2px 8px;font-size:0.75rem;font-weight:700}
+/* Wishlist */
+.wishlist-panel{position:fixed;top:0;left:-100%;width:100%;height:100%;background:#0f0f0f;z-index:2500;transition:left 0.3s ease;overflow-y:auto}
+body.light .wishlist-panel{background:#fafafa}
 .wishlist-panel.open{left:0}
-.wishlist-header{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;background:linear-gradient(135deg,#1a237e,#0d47a1)}
-.wishlist-header h2{color:#fff;font-size:1.2rem}
-.close-wishlist{background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer}
+.wishlist-header{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;background:linear-gradient(135deg,#1a1a1a,#2d2d2d);border-bottom:2px solid #f0a500}
+.wishlist-header h2{color:#f0a500;font-size:1.2rem;letter-spacing:2px;font-weight:700}
+.close-wishlist{background:none;border:none;color:#f0a500;font-size:1.5rem;cursor:pointer}
 .wishlist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;padding:15px}
-.empty-wishlist{text-align:center;padding:60px 20px;color:#546e7a;font-size:1rem}
-.wishlist-item{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:4/3;background:#1a237e}
+.empty-wishlist{text-align:center;padding:60px 20px;color:#888;font-size:1rem}
+.wishlist-item{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:4/3;background:#1a1a1a;border:1px solid #2a2a2a}
 .wishlist-item img{width:100%;height:100%;object-fit:cover}
-.wishlist-remove{position:absolute;top:6px;right:6px;background:rgba(229,57,53,0.85);border:none;border-radius:50%;width:28px;height:28px;color:#fff;font-size:0.8rem;cursor:pointer}
+.wishlist-remove{position:absolute;top:6px;right:6px;background:rgba(240,165,0,0.9);border:none;border-radius:50%;width:28px;height:28px;color:#000;font-size:0.8rem;cursor:pointer;font-weight:700}
 /* Lightbox */
-.lightbox{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.97);z-index:3000;justify-content:center;align-items:center;flex-direction:column}
+.lightbox{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.98);z-index:3000;justify-content:center;align-items:center;flex-direction:column}
 .lightbox.active{display:flex}
-.lightbox img{max-width:90%;max-height:65vh;border-radius:10px;object-fit:contain;box-shadow:0 0 30px rgba(100,150,255,0.3)}
-.lightbox-caption{margin-top:8px;color:#90caf9;font-size:0.85rem;text-align:center;padding:0 20px}
+.lightbox img{max-width:90%;max-height:65vh;border-radius:10px;object-fit:contain;box-shadow:0 0 30px rgba(240,165,0,0.2)}
+.lightbox-caption{margin-top:8px;color:#f0a500;font-size:0.85rem;text-align:center;padding:0 20px;letter-spacing:1px}
 .lightbox-controls{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;justify-content:center}
-.lightbox-controls button{padding:8px 18px;background:linear-gradient(135deg,#1565c0,#0d47a1);color:#fff;border:none;border-radius:25px;font-size:0.9rem;cursor:pointer;font-weight:bold}
-.lightbox-controls a{padding:8px 18px;background:linear-gradient(135deg,#2e7d32,#1b5e20);color:#fff;border:none;border-radius:25px;font-size:0.9rem;cursor:pointer;font-weight:bold;text-decoration:none}
-.close-btn{position:absolute;top:20px;right:25px;font-size:2rem;color:#90caf9;cursor:pointer;background:none;border:none}
+.lightbox-controls button{padding:8px 20px;background:#f0a500;color:#000;border:none;border-radius:25px;font-size:0.9rem;cursor:pointer;font-weight:700}
+.lightbox-controls button:hover{background:#ffd54f}
+.lightbox-controls a{padding:8px 20px;background:#2a2a2a;color:#f0a500;border:2px solid #f0a500;border-radius:25px;font-size:0.9rem;cursor:pointer;font-weight:700;text-decoration:none}
+.close-btn{position:absolute;top:20px;right:25px;font-size:2rem;color:#f0a500;cursor:pointer;background:none;border:none}
 </style>
 </head>
 <body>
 <header>
-<h1>🖼 Image Gallery</h1>
+<h1>⬡ IMAGE GALLERY</h1>
 <button class="menu-btn" onclick="openSettings()">☰</button>
 </header>
 <div class="search-bar">
 <input type="text" id="searchInput" placeholder="Search any image..." onkeypress="if(event.key==='Enter')doSearch()"/>
-<button onclick="doSearch()">Search</button>
+<button onclick="doSearch()">SEARCH</button>
 </div>
 <div class="filter-buttons">
 <button class="active" onclick="loadCategory('nature',this)">Nature</button>
@@ -111,26 +116,26 @@ body.light .wishlist-panel{background:#f0f4ff}
 <button onclick="loadCategory('technology',this)">Technology</button>
 </div>
 <div class="result-count" id="resultCount"></div>
-<div class="page-info" id="pageInfo">Page 1</div>
+<div class="page-info" id="pageInfo">PAGE 1</div>
 <div class="loading" id="loading">Loading...</div>
 <div class="slider-wrapper" id="sliderWrapper">
 <div class="slider" id="slider"></div>
 </div>
 <div class="nav-buttons">
-<button id="prevBtn" onclick="prevPage()" disabled>&#8592; Prev</button>
-<button id="nextBtn" onclick="nextPage()">Next &#8594;</button>
+<button id="prevBtn" onclick="prevPage()" disabled>&#8592; PREV</button>
+<button id="nextBtn" onclick="nextPage()">NEXT &#8594;</button>
 </div>
 <button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 <div class="overlay-bg" id="overlayBg" onclick="closeSettings()"></div>
 <div class="settings-panel" id="settingsPanel">
 <div class="settings-header">
-<h2>☰ Menu</h2>
+<h2>☰ MENU</h2>
 <button class="close-settings" onclick="closeSettings()">✕</button>
 </div>
 <div class="menu-section">
 <div class="menu-section-title">Preferences</div>
 <div class="setting-item">
-<label>🌙 Light Mode</label>
+<label>☀ Light Mode</label>
 <label class="toggle">
 <input type="checkbox" id="themeToggle" onchange="toggleTheme()"/>
 <span class="toggle-slider"></span>
@@ -138,7 +143,7 @@ body.light .wishlist-panel{background:#f0f4ff}
 </div>
 <div class="setting-item">
 <label>📄 Per Page</label>
-<select id="perPageSelect" onchange="changePerPage()" style="background:#1565c0;color:#fff;border:none;border-radius:8px;padding:4px 8px;cursor:pointer">
+<select id="perPageSelect" onchange="changePerPage()" style="background:#f0a500;color:#000;border:none;border-radius:8px;padding:4px 8px;cursor:pointer;font-weight:700">
 <option value="12">12</option>
 <option value="18">18</option>
 <option value="24">24</option>
@@ -153,23 +158,21 @@ body.light .wishlist-panel{background:#f0f4ff}
 </div>
 </div>
 </div>
-<!-- Wishlist -->
 <div class="wishlist-panel" id="wishlistPanel">
 <div class="wishlist-header">
-<h2>❤ My Wishlist</h2>
+<h2>❤ WISHLIST</h2>
 <button class="close-wishlist" onclick="closeWishlist()">✕</button>
 </div>
 <div class="wishlist-grid" id="wishlistGrid"></div>
 </div>
-<!-- Lightbox -->
 <div class="lightbox" id="lightbox">
 <button class="close-btn" onclick="closeLightbox()">✕</button>
 <img id="lightbox-img" src="" alt=""/>
 <p class="lightbox-caption" id="lightbox-caption"></p>
 <div class="lightbox-controls">
-<button onclick="changeLightbox(-1)">&#8592; Prev</button>
-<a id="downloadBtn" href="#" download target="_blank">⬇ Download</a>
-<button onclick="changeLightbox(1)">Next &#8594;</button>
+<button onclick="changeLightbox(-1)">&#8592; PREV</button>
+<a id="downloadBtn" href="#" download target="_blank">⬇ DOWNLOAD</a>
+<button onclick="changeLightbox(1)">NEXT &#8594;</button>
 </div>
 </div>
 <script>
@@ -185,35 +188,17 @@ let touchStartX=0;
 let perPage=12;
 let wishlist=JSON.parse(localStorage.getItem('gallery_wishlist')||'[]');
 
-function updateWishlistBadge(){
-document.getElementById('wishlistBadge').textContent=wishlist.length;
-}
-
-function toggleTheme(){
-const isLight=document.getElementById('themeToggle').checked;
-document.body.classList.toggle('light',isLight);
-}
-
-function changePerPage(){
-perPage=parseInt(document.getElementById('perPageSelect').value);
-pagesData={};currentPage=1;
-goToPage(1);closeSettings();
-}
-
-function openSettings(){
-document.getElementById('settingsPanel').classList.add('open');
-document.getElementById('overlayBg').classList.add('open');
-}
-function closeSettings(){
-document.getElementById('settingsPanel').classList.remove('open');
-document.getElementById('overlayBg').classList.remove('open');
-}
+function updateWishlistBadge(){document.getElementById('wishlistBadge').textContent=wishlist.length}
+function toggleTheme(){document.body.classList.toggle('light',document.getElementById('themeToggle').checked)}
+function changePerPage(){perPage=parseInt(document.getElementById('perPageSelect').value);pagesData={};currentPage=1;goToPage(1);closeSettings()}
+function openSettings(){document.getElementById('settingsPanel').classList.add('open');document.getElementById('overlayBg').classList.add('open')}
+function closeSettings(){document.getElementById('settingsPanel').classList.remove('open');document.getElementById('overlayBg').classList.remove('open')}
 
 function openWishlist(){
 const grid=document.getElementById('wishlistGrid');
 grid.innerHTML='';
 if(wishlist.length===0){
-grid.innerHTML='<div class="empty-wishlist">💙 No saved images yet!<br><br>Double tap any image to save</div>';
+grid.innerHTML='<div class="empty-wishlist">No saved images yet!<br><br>Double tap any image to save ❤</div>';
 }else{
 wishlist.forEach((img,i)=>{
 const item=document.createElement('div');
@@ -221,33 +206,17 @@ item.className='wishlist-item';
 const image=document.createElement('img');
 image.src=img.webformatURL;
 image.alt=img.tags;
-image.onclick=()=>{
-lightboxImages=wishlist;
-lightboxIndex=i;
-updateLightbox();
-document.getElementById('lightbox').classList.add('active');
-};
+image.onclick=()=>{lightboxImages=wishlist;lightboxIndex=i;updateLightbox();document.getElementById('lightbox').classList.add('active')};
 const removeBtn=document.createElement('button');
 removeBtn.className='wishlist-remove';
 removeBtn.textContent='✕';
-removeBtn.onclick=(e)=>{
-e.stopPropagation();
-wishlist.splice(i,1);
-localStorage.setItem('gallery_wishlist',JSON.stringify(wishlist));
-updateWishlistBadge();
-openWishlist();
-};
-item.appendChild(image);
-item.appendChild(removeBtn);
-grid.appendChild(item);
+removeBtn.onclick=(e)=>{e.stopPropagation();wishlist.splice(i,1);localStorage.setItem('gallery_wishlist',JSON.stringify(wishlist));updateWishlistBadge();openWishlist()};
+item.appendChild(image);item.appendChild(removeBtn);grid.appendChild(item);
 });
 }
 document.getElementById('wishlistPanel').classList.add('open');
 }
-function closeWishlist(){
-document.getElementById('wishlistPanel').classList.remove('open');
-}
-
+function closeWishlist(){document.getElementById('wishlistPanel').classList.remove('open')}
 function isWishlisted(img){return wishlist.some(w=>w.id===img.id)}
 
 async function fetchPage(query,page){
@@ -267,11 +236,7 @@ const slider=document.getElementById('slider');
 slider.innerHTML='';
 const pageEl=document.createElement('div');
 pageEl.className='page';
-for(let i=0;i<perPage;i++){
-const item=document.createElement('div');
-item.className='gallery-item skeleton';
-pageEl.appendChild(item);
-}
+for(let i=0;i<perPage;i++){const item=document.createElement('div');item.className='gallery-item skeleton';pageEl.appendChild(item)}
 slider.appendChild(pageEl);
 }
 
@@ -281,77 +246,49 @@ pageEl.className='page';
 imgs.forEach((img,i)=>{
 const item=document.createElement('div');
 item.className='gallery-item';
-
 const image=new Image();
 image.src=img.webformatURL;
 image.alt=img.tags;
 image.loading='lazy';
 image.onerror=function(){this.src=img.previewURL};
-
 const overlay=document.createElement('div');
 overlay.className='overlay';
-overlay.innerHTML=`<p>${img.tags.split(',')[0]}</p>`;
-
+overlay.innerHTML=`<p>${img.tags.split(',')[0].toUpperCase()}</p>`;
 const heartAnim=document.createElement('div');
 heartAnim.className='heart-anim';
 heartAnim.textContent='❤️';
-
 const likedIndicator=document.createElement('div');
 likedIndicator.className='liked-indicator'+(isWishlisted(img)?' show':'');
 likedIndicator.textContent='❤️';
-
-item.appendChild(image);
-item.appendChild(overlay);
-item.appendChild(heartAnim);
-item.appendChild(likedIndicator);
-
+item.appendChild(image);item.appendChild(overlay);item.appendChild(heartAnim);item.appendChild(likedIndicator);
 let lastTap=0;
 item.addEventListener('click',()=>{
 const now=Date.now();
 const diff=now-lastTap;
 if(diff<300&&diff>0){
-// double tap
-if(isWishlisted(img)){
-wishlist=wishlist.filter(w=>w.id!==img.id);
-likedIndicator.classList.remove('show');
+if(isWishlisted(img)){wishlist=wishlist.filter(w=>w.id!==img.id);likedIndicator.classList.remove('show')}
+else{wishlist.push(img);likedIndicator.classList.add('show');heartAnim.classList.add('show');setTimeout(()=>heartAnim.classList.remove('show'),600)}
+localStorage.setItem('gallery_wishlist',JSON.stringify(wishlist));updateWishlistBadge();
 }else{
-wishlist.push(img);
-likedIndicator.classList.add('show');
-heartAnim.classList.add('show');
-setTimeout(()=>heartAnim.classList.remove('show'),600);
-}
-localStorage.setItem('gallery_wishlist',JSON.stringify(wishlist));
-updateWishlistBadge();
-}else{
-// single tap - open lightbox
-setTimeout(()=>{
-if(Date.now()-lastTap>=300){
-lightboxImages=imgs;
-lightboxIndex=i;
-updateLightbox();
-document.getElementById('lightbox').classList.add('active');
-}
-},300);
+setTimeout(()=>{if(Date.now()-lastTap>=300){lightboxImages=imgs;lightboxIndex=i;updateLightbox();document.getElementById('lightbox').classList.add('active')}},300);
 }
 lastTap=now;
 });
-
 pageEl.appendChild(item);
 });
 return pageEl;
 }
 
 async function goToPage(page){
-currentPage=page;
-showSkeleton();
+currentPage=page;showSkeleton();
 document.getElementById('loading').style.display='block';
 const imgs=await fetchPage(currentQuery,page);
 document.getElementById('loading').style.display='none';
 const slider=document.getElementById('slider');
 slider.innerHTML='';
 slider.appendChild(createPageEl(imgs));
-document.getElementById('pageInfo').textContent=`Page ${page} of ${totalPages}`;
-document.getElementById('resultCount').textContent=`${totalHits.toLocaleString()} images found`;
+document.getElementById('pageInfo').textContent=`PAGE ${page} OF ${totalPages}`;
+document.getElementById('resultCount').textContent=`${totalHits.toLocaleString()} IMAGES FOUND`;
 document.getElementById('prevBtn').disabled=page<=1;
 document.getElementById('nextBtn').disabled=page>=totalPages;
 window.scrollTo({top:0,behavior:'smooth'});
@@ -360,10 +297,8 @@ if(page<totalPages)fetchPage(currentQuery,page+1);
 
 async function loadCategory(query,btn){
 document.querySelectorAll('.filter-buttons button').forEach(b=>b.classList.remove('active'));
-btn.classList.add('active');
-currentQuery=query;currentPage=1;pagesData={};
-document.getElementById('searchInput').value='';
-await goToPage(1);
+btn.classList.add('active');currentQuery=query;currentPage=1;pagesData={};
+document.getElementById('searchInput').value='';await goToPage(1);
 }
 
 async function doSearch(){
@@ -377,28 +312,22 @@ await goToPage(1);
 function prevPage(){if(currentPage>1)goToPage(currentPage-1)}
 function nextPage(){if(currentPage<totalPages)goToPage(currentPage+1)}
 
-window.addEventListener('scroll',()=>{
-document.getElementById('backToTop').style.display=window.scrollY>300?'block':'none';
-});
+window.addEventListener('scroll',()=>{document.getElementById('backToTop').style.display=window.scrollY>300?'block':'none'});
 
 document.getElementById('sliderWrapper').addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX},{passive:true});
 document.getElementById('sliderWrapper').addEventListener('touchend',e=>{
 const diff=touchStartX-e.changedTouches[0].clientX;
-if(diff>50)nextPage();
-else if(diff<-50)prevPage();
+if(diff>50)nextPage();else if(diff<-50)prevPage();
 },{passive:true});
 
 function updateLightbox(){
 const img=lightboxImages[lightboxIndex];
 document.getElementById('lightbox-img').src=img.largeImageURL;
-document.getElementById('lightbox-caption').textContent=img.tags.split(',').slice(0,3).join(', ');
+document.getElementById('lightbox-caption').textContent=img.tags.split(',').slice(0,3).join(' · ').toUpperCase();
 document.getElementById('downloadBtn').href=img.largeImageURL;
 }
 function closeLightbox(){document.getElementById('lightbox').classList.remove('active')}
-function changeLightbox(dir){
-lightboxIndex=(lightboxIndex+dir+lightboxImages.length)%lightboxImages.length;
-updateLightbox();
-}
+function changeLightbox(dir){lightboxIndex=(lightboxIndex+dir+lightboxImages.length)%lightboxImages.length;updateLightbox()}
 
 updateWishlistBadge();
 loadCategory('nature',document.querySelector('.filter-buttons button'));
