@@ -159,7 +159,7 @@ body.light .wishlist-panel{background:#fafafa}
 </div>
 <div class="lightbox" id="lightbox">
 <button class="close-btn" onclick="closeLightbox()">✕</button>
-<img id="lightbox-img" src="" alt=""/>
+<img id="lightbox-img" src="" alt="" referrerpolicy="no-referrer"/>
 <p class="lightbox-caption" id="lightbox-caption"></p>
 <div class="lightbox-controls">
 <button onclick="changeLightbox(-1)">&#8592; PREV</button>
@@ -181,13 +181,7 @@ let perPage=12;
 let wishlist=JSON.parse(localStorage.getItem('gallery_wishlist')||'[]');
 
 function saveImg(img){
-return{
-id:img.id,
-previewURL:img.previewURL,
-webformatURL:img.previewURL,
-largeImageURL:img.largeImageURL,
-tags:img.tags
-};
+return{id:img.id,pageURL:img.pageURL,webformatURL:img.webformatURL,largeImageURL:img.largeImageURL,previewURL:img.previewURL,tags:img.tags};
 }
 
 function updateWishlistBadge(){document.getElementById('wishlistBadge').textContent=wishlist.length}
@@ -206,9 +200,16 @@ wishlist.forEach((img,i)=>{
 const item=document.createElement('div');
 item.className='wishlist-item';
 const image=document.createElement('img');
-image.src=img.previewURL;
+image.setAttribute('referrerpolicy','no-referrer');
+image.src=img.webformatURL;
 image.alt=img.tags;
-image.onclick=()=>{window.open('https://pixabay.com/images/search/'+encodeURIComponent(img.tags.split(',')[0]),'_blank')};
+image.onerror=function(){this.src=img.previewURL};
+image.onclick=()=>{
+lightboxImages=wishlist;
+lightboxIndex=i;
+updateLightbox();
+document.getElementById('lightbox').classList.add('active');
+};
 const removeBtn=document.createElement('button');
 removeBtn.className='wishlist-remove';
 removeBtn.textContent='✕';
@@ -249,9 +250,11 @@ imgs.forEach((img,i)=>{
 const item=document.createElement('div');
 item.className='gallery-item';
 const image=new Image();
-image.src=img.previewURL;
+image.setAttribute('referrerpolicy','no-referrer');
+image.src=img.webformatURL;
 image.alt=img.tags;
 image.loading='lazy';
+image.onerror=function(){this.src=img.previewURL};
 const overlay=document.createElement('div');
 overlay.className='overlay';
 overlay.innerHTML=`<p>${img.tags.split(',')[0].toUpperCase()}</p>`;
@@ -323,7 +326,10 @@ if(diff>50)nextPage();else if(diff<-50)prevPage();
 
 function updateLightbox(){
 const img=lightboxImages[lightboxIndex];
-document.getElementById('lightbox-img').src=img.largeImageURL;
+const lightboxImg=document.getElementById('lightbox-img');
+lightboxImg.setAttribute('referrerpolicy','no-referrer');
+lightboxImg.src=img.largeImageURL;
+lightboxImg.onerror=function(){this.src=img.webformatURL};
 document.getElementById('lightbox-caption').textContent=img.tags.split(',').slice(0,3).join(' · ').toUpperCase();
 document.getElementById('downloadBtn').href=img.largeImageURL;
 }
