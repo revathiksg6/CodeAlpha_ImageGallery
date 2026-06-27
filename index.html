@@ -208,7 +208,7 @@ item.className='wishlist-item';
 const image=document.createElement('img');
 image.src=img.previewURL;
 image.alt=img.tags;
-image.onclick=()=>{lightboxImages=wishlist.map(w=>({...w}));lightboxIndex=i;updateLightbox();document.getElementById('lightbox').classList.add('active')};
+image.onclick=()=>{window.open('https://pixabay.com/images/search/'+encodeURIComponent(img.tags.split(',')[0]),'_blank')};
 const removeBtn=document.createElement('button');
 removeBtn.className='wishlist-remove';
 removeBtn.textContent='✕';
