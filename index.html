@@ -81,14 +81,21 @@ body.light .wishlist-panel{background:#fafafa}
 .wishlist-item{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:4/3;background:#1a1a1a;border:1px solid #2a2a2a}
 .wishlist-item img{width:100%;height:100%;object-fit:cover;cursor:pointer}
 .wishlist-remove{position:absolute;top:6px;right:6px;background:rgba(240,165,0,0.9);border:none;border-radius:50%;width:28px;height:28px;color:#000;font-size:0.8rem;cursor:pointer;font-weight:700}
-.lightbox{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.98);z-index:3000;justify-content:center;align-items:center;flex-direction:column}
+.lightbox{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.98);z-index:3000;justify-content:center;align-items:center;flex-direction:column;padding:20px}
 .lightbox.active{display:flex}
-.lightbox img{max-width:90%;max-height:65vh;border-radius:10px;object-fit:contain}
-.lightbox-caption{margin-top:8px;color:#f0a500;font-size:0.85rem;text-align:center;padding:0 20px}
-.lightbox-controls{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;justify-content:center}
-.lightbox-controls button{padding:8px 20px;background:#f0a500;color:#000;border:none;border-radius:25px;font-size:0.9rem;cursor:pointer;font-weight:700}
-.lightbox-controls a{padding:8px 20px;background:#2a2a2a;color:#f0a500;border:2px solid #f0a500;border-radius:25px;font-size:0.9rem;font-weight:700;text-decoration:none}
+.lightbox img{max-width:90%;max-height:55vh;border-radius:10px;object-fit:contain}
+.lightbox-details{margin-top:8px;text-align:center;width:90%}
+.lightbox-caption{color:#f0a500;font-size:0.85rem;letter-spacing:1px;margin-bottom:6px}
+.lightbox-meta{display:flex;justify-content:center;gap:15px;flex-wrap:wrap;margin-bottom:10px}
+.lightbox-meta span{color:#888;font-size:0.75rem;background:#1a1a1a;padding:3px 10px;border-radius:10px}
+.lightbox-controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.lightbox-controls button{padding:8px 16px;background:#f0a500;color:#000;border:none;border-radius:25px;font-size:0.85rem;cursor:pointer;font-weight:700}
+.lightbox-controls a{padding:8px 16px;background:#2a2a2a;color:#f0a500;border:2px solid #f0a500;border-radius:25px;font-size:0.85rem;font-weight:700;text-decoration:none}
+.btn-share-wa{background:#25d366!important;color:#fff!important;border:none!important}
+.btn-share-copy{background:#2a2a2a;color:#f0a500;border:2px solid #f0a500!important}
 .close-btn{position:absolute;top:20px;right:25px;font-size:2rem;color:#f0a500;cursor:pointer;background:none;border:none}
+.copy-toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#f0a500;color:#000;padding:8px 20px;border-radius:20px;font-weight:700;font-size:0.85rem;display:none;z-index:9999}
+.copy-toast.show{display:block}
 </style>
 </head>
 <body>
@@ -118,6 +125,7 @@ body.light .wishlist-panel{background:#fafafa}
 <button id="nextBtn" onclick="nextPage()">NEXT &#8594;</button>
 </div>
 <button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<div class="copy-toast" id="copyToast">Link Copied!</div>
 <div class="overlay-bg" id="overlayBg" onclick="closeSettings()"></div>
 <div class="settings-panel" id="settingsPanel">
 <div class="settings-header">
@@ -128,10 +136,7 @@ body.light .wishlist-panel{background:#fafafa}
 <div class="menu-section-title">Preferences</div>
 <div class="setting-item">
 <label>☀ Light Mode</label>
-<label class="toggle">
-<input type="checkbox" id="themeToggle" onchange="toggleTheme()"/>
-<span class="toggle-slider"></span>
-</label>
+<label class="toggle"><input type="checkbox" id="themeToggle" onchange="toggleTheme()"/><span class="toggle-slider"></span></label>
 </div>
 <div class="setting-item">
 <label>📄 Per Page</label>
@@ -160,11 +165,16 @@ body.light .wishlist-panel{background:#fafafa}
 <div class="lightbox" id="lightbox">
 <button class="close-btn" onclick="closeLightbox()">✕</button>
 <img id="lightbox-img" src="" alt="" referrerpolicy="no-referrer"/>
-<p class="lightbox-caption" id="lightbox-caption"></p>
+<div class="lightbox-details">
+<div class="lightbox-caption" id="lightbox-caption"></div>
+<div class="lightbox-meta" id="lightbox-meta"></div>
 <div class="lightbox-controls">
 <button onclick="changeLightbox(-1)">&#8592; PREV</button>
 <a id="downloadBtn" href="#" download target="_blank">⬇ DOWNLOAD</a>
+<button class="btn-share-wa" id="shareWa" onclick="shareWhatsApp()">WhatsApp</button>
+<button class="btn-share-copy" onclick="copyLink()">Copy Link</button>
 <button onclick="changeLightbox(1)">NEXT &#8594;</button>
+</div>
 </div>
 </div>
 <script>
@@ -181,7 +191,7 @@ let perPage=12;
 let wishlist=JSON.parse(localStorage.getItem('gallery_wishlist')||'[]');
 
 function saveImg(img){
-return{id:img.id,pageURL:img.pageURL,webformatURL:img.webformatURL,largeImageURL:img.largeImageURL,previewURL:img.previewURL,tags:img.tags};
+return{id:img.id,pageURL:img.pageURL,webformatURL:img.webformatURL,largeImageURL:img.largeImageURL,previewURL:img.previewURL,tags:img.tags,user:img.user,imageWidth:img.imageWidth,imageHeight:img.imageHeight,type:img.type};
 }
 
 function updateWishlistBadge(){document.getElementById('wishlistBadge').textContent=wishlist.length}
@@ -204,12 +214,7 @@ image.setAttribute('referrerpolicy','no-referrer');
 image.src=img.webformatURL;
 image.alt=img.tags;
 image.onerror=function(){this.src=img.previewURL};
-image.onclick=()=>{
-lightboxImages=wishlist;
-lightboxIndex=i;
-updateLightbox();
-document.getElementById('lightbox').classList.add('active');
-};
+image.onclick=()=>{lightboxImages=wishlist;lightboxIndex=i;updateLightbox();document.getElementById('lightbox').classList.add('active')};
 const removeBtn=document.createElement('button');
 removeBtn.className='wishlist-remove';
 removeBtn.textContent='✕';
@@ -331,8 +336,29 @@ lightboxImg.setAttribute('referrerpolicy','no-referrer');
 lightboxImg.src=img.largeImageURL;
 lightboxImg.onerror=function(){this.src=img.webformatURL};
 document.getElementById('lightbox-caption').textContent=img.tags.split(',').slice(0,3).join(' · ').toUpperCase();
+document.getElementById('lightbox-meta').innerHTML=`
+<span>📷 ${img.user||'Unknown'}</span>
+<span>🖼 ${img.imageWidth||'?'}×${img.imageHeight||'?'}</span>
+<span>🏷 ${img.type||'photo'}</span>
+`;
 document.getElementById('downloadBtn').href=img.largeImageURL;
 }
+
+function shareWhatsApp(){
+const img=lightboxImages[lightboxIndex];
+const text=`Check out this image: ${img.pageURL}`;
+window.open(`https://wa.me/?text=${encodeURIComponent(text)}`,'_blank');
+}
+
+function copyLink(){
+const img=lightboxImages[lightboxIndex];
+navigator.clipboard.writeText(img.pageURL).then(()=>{
+const toast=document.getElementById('copyToast');
+toast.classList.add('show');
+setTimeout(()=>toast.classList.remove('show'),2000);
+});
+}
+
 function closeLightbox(){document.getElementById('lightbox').classList.remove('active')}
 function changeLightbox(dir){lightboxIndex=(lightboxIndex+dir+lightboxImages.length)%lightboxImages.length;updateLightbox()}
 
